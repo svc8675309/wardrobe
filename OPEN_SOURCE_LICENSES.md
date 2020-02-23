@@ -81,3 +81,9 @@ https://github.com/react-navigation/react-navigation
 Copyright (c) 2017 React Native Community
 
 https://github.com/hilkeheremans/react-navigation-tabs
+
+## font-awesome
+
+License CC 3.0 BY.
+
+https://www.flaticon.com/packs/font-awesome

@@ -22,6 +22,15 @@ A clothing management tool allowing users to
     ( Wardrobe Storage Unit ), created when this app is first launched, or by using the included camera. 
     All state including article selections, ratings, and album contents are stored locally.
 
+## Images / Icons
+
+    To keep this repo public I had to gitignore my licensed ( www.flaticon.com ) images. So when you see code like
+    
+    ...  Constants.open ?  require('../../assets/open-resources ...
+
+    Basically I provide some font-awesome and custom images for opensource, then change the setting locally to use my "Store bought" 
+    local resources image dir for distribution.
+
 ## Usage
 
 ![wCa](/assets/open-resources/wardrobe-sm.png)

@@ -142,7 +142,7 @@ export default class App extends Component<IState, any> {
             textContent={'Loading...'}
             textStyle={{ color: '#FFF' }}
           />
-          <Image source={Constants.open ? require('../../assets/open-resources/wardrobe-app.png') : require('./assets/resources/wardrobe-app.png')} style={styles.image} />
+          <Image source={Constants.open ? require('./assets/open-resources/wardrobe-app.png') : require('./assets/resources/wardrobe-app.png')} style={styles.image} />
         </View>);
     }
   }

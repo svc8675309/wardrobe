@@ -154,4 +154,7 @@ https://github.com/evetstech/react-native-settings-list
 
 Copyright (c) 2017 React Native Community
 https://github.com/hilkeheremans/react-navigation-tabs
+
+License CC 3.0 BY.
+https://www.flaticon.com/packs/font-awesome
 `;
