@@ -31,13 +31,11 @@ export default class SettingsView extends Component<any, IState> {
   render() {
     return (
       <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
-        <View style={{ borderBottomWidth: 1, backgroundColor: '#f7f7f8', borderColor: '#c8c7cc' }}>
-          <Text style={{ alignSelf: 'center', marginTop: 30, marginBottom: 10, fontWeight: 'bold', fontSize: 16 }}>Settings</Text>
-        </View>
         <View style={{ backgroundColor: '#EFEFF4', flex: 1 }}>
           <SettingsList borderColor='#c8c7cc' defaultItemSize={50}>
             <SettingsList.Header headerStyle={{ marginTop: 15 }} />
             <SettingsList.Item
+              titleStyle={styles.bText}
               icon={<Image source={ Constants.open ?  require('../../assets/open-resources/hanger_off.png') :require('../../assets/resources/hanger_off.png')} style={smallImageStyle.image} />}
               hasSwitch={true}
               switchState={false}
@@ -49,6 +47,7 @@ export default class SettingsView extends Component<any, IState> {
               title='Clear Article Selections'
             />
             <SettingsList.Item
+              titleStyle={styles.bText}
               icon={<Image source={ Constants.open ?  require('../../assets/open-resources/open-source.png') :require('../../assets/resources/open-source.png')} style={smallImageStyle.image} />}
               hasNavArrow={true}
               title='Credits'
@@ -62,9 +61,9 @@ export default class SettingsView extends Component<any, IState> {
               animationOut={"fadeOut"}>
               <View style={styles.content}>
                 <Image source={ Constants.open ?  require('../../assets/open-resources/svc.jpg') :require('../../assets/resources/svc.jpg')} style={{resizeMode: 'contain'}} />
-                <Text>{me}</Text>
+                <Text style={styles.bText}>{me}</Text>
                 <ScrollView style={styles.openSoruceStyle}>
-                  <Text style={styles.baseText}>{textBody}</Text>
+                  <Text style={styles.bText}>{textBody}</Text>
                 </ScrollView>
                 <TouchableOpacity style={{paddingTop: 10}} onPress={() => { this.closeModal() }} >
                   <Image source={ Constants.open ?  require('../../assets/open-resources/check.png') :require('../../assets/resources/check.png')} style={smallImageStyle.image} />
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
     padding: 16,
     margin: 16,
     borderRadius: 13,
-    height:hp(60),
+    height:hp(85),
     backgroundColor: "white",
     overflow: "hidden"
   },
@@ -102,10 +101,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
   },
-  baseText: {
-    fontFamily: 'Arial',
-    fontSize: 12
-  },
+  bText: Platform.select({
+		ios: {
+      fontFamily: 'Arial',
+      fontSize: 4
+		},
+		android: {
+      fontFamily: 'Arial',
+      fontSize: 12
+		}
+	})
 });
 
 const me = `
@@ -157,4 +162,7 @@ https://github.com/hilkeheremans/react-navigation-tabs
 
 License CC 3.0 BY.
 https://www.flaticon.com/packs/font-awesome
+
+Copyright (c) 2015 Florian Rival and Alexandre Moureaux
+https://github.com/bamlab/react-native-image-resizer
 `;

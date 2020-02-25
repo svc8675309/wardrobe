@@ -87,3 +87,9 @@ https://github.com/hilkeheremans/react-navigation-tabs
 License CC 3.0 BY.
 
 https://www.flaticon.com/packs/font-awesome
+
+## react-native-image-resizer
+
+Copyright (c) 2015 Florian Rival and Alexandre Moureaux
+
+https://github.com/bamlab/react-native-image-resizer

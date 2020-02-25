@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import { Image, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { RNCamera, TakePictureResponse } from 'react-native-camera';
 import { PinchGestureHandler, PinchGestureHandlerGestureEvent, PinchGestureHandlerStateChangeEvent, State } from 'react-native-gesture-handler';
+import ImageResizer from 'react-native-image-resizer';
 import { NavigationContainerProps, NavigationEventSubscription } from 'react-navigation';
 import { smallImageStyle } from '../main-app';
 import { Article, ArticleType, hp } from '../shared/article';
@@ -10,21 +11,27 @@ import { Constants } from "../shared/constants";
 import { SimpleCallback } from "../shared/simple-callback";
 import ArticleSelect from './article-select';
 
+
 interface IState {
+	focusedScreen: boolean;
 	zoom: number;
 	flash: any;
+	isTakingImage: boolean
 }
 
 export default class CameraView extends Component<NavigationContainerProps, IState> {
 	static navigationOptions = {
 		swipeEnabled: false,
 		tabBarIcon: ({ tintColor, focused }) => (
-			<Image source={ Constants.open ?  require('../../assets/open-resources/camera.png') : require('../../assets/resources/camera.png')} style={smallImageStyle.image} />
+			<Image source={Constants.open ? require('../../assets/open-resources/camera.png') : require('../../assets/resources/camera.png')} style={smallImageStyle.image} />
 		)
 	};
 
 	// invoked when this tab gained focus
-	focusListener: NavigationEventSubscription;
+	didFocusListener: NavigationEventSubscription;
+	willfocusListener: NavigationEventSubscription;
+	willBlurListener: NavigationEventSubscription;
+
 
 	ZOOM_F = Platform.OS === 'ios' ? 0.0005 : 0.08;
 
@@ -38,6 +45,8 @@ export default class CameraView extends Component<NavigationContainerProps, ISta
 		this.state = {
 			zoom: 0,
 			flash: RNCamera.Constants.FlashMode.off,
+			focusedScreen: true,
+			isTakingImage: false
 		};
 
 		this.snap = this.snap.bind(this);
@@ -58,7 +67,7 @@ export default class CameraView extends Component<NavigationContainerProps, ISta
 	 * Called from ArticlePager.onAddArticleDlg();
 	 */
 	componentDidMount() {
-		this.focusListener = this.props.navigation.addListener('didFocus',
+		this.didFocusListener = this.props.navigation.addListener('didFocus',
 			payload => {
 				if (payload.state.params.articleType) {
 					// If the user selects the camera tab first 
@@ -68,10 +77,17 @@ export default class CameraView extends Component<NavigationContainerProps, ISta
 					this.articleSelectRef.current.onArticleTypeSelect(ArticleType.wBottom);
 				}
 			});
+		this.willfocusListener = this.props.navigation.addListener('willFocus',
+			() => this.setState({ focusedScreen: true }));
+
+		this.didFocusListener = this.props.navigation.addListener('willBlur',
+			() => this.setState({ focusedScreen: false }));
 	}
 
 	componentWillUnmount() {
-		this.focusListener.remove()
+		this.didFocusListener.remove();
+		this.willfocusListener.remove();
+		this.didFocusListener.remove();
 	}
 	async snap() {
 		if (this.camera && this.camera.current) {
@@ -80,16 +96,27 @@ export default class CameraView extends Component<NavigationContainerProps, ISta
 				base64: true,
 				orientation: RNCamera.Constants.Orientation.auto,
 				pauseAfterCapture: false,
-				fixOrientation: false,
+				fixOrientation: false, // android only
 			};
+			// required to prevent freeze https://github.com/expo/expo/issues/2288
+			setTimeout(() => this.setState({ isTakingImage: true }), 1);
+
 			const data: TakePictureResponse | void = await this.camera.current.takePictureAsync(options)
 				.catch((error) => console.log(`CameraView.snap() error : ${error}`));
+
+			this.setState({ isTakingImage: false });
+
 			if (data) {
-				CameraRoll.save(data.uri, { type: 'photo', album: Constants.wStorageUnitName })
+				let uri: string = data.uri;
+				const response = await ImageResizer.createResizedImage(data.uri, 512, 384, "JPEG", 100);
+				if (response) {
+					uri = response.uri;
+				}
+				CameraRoll.save(uri, { type: 'photo', album: Constants.wStorageUnitName })
 					.then((uri) => {
 						const article = new Article(uri, this.articleSelectRef.current.onGetArticleType());
 						SimpleCallback.emit(article);
-						this.props.navigation.navigate('Wardrobe');
+						//this.props.navigation.navigate('Wardrobe');
 					}).catch((error) => console.log(`CameraView.snap() cannot add to camera role error : ${error}`));
 			} else {
 				this.cancel().catch((error) => console.log(`CameraView.snap() cancel error : ${error}`));
@@ -160,51 +187,78 @@ export default class CameraView extends Component<NavigationContainerProps, ISta
 	}
 
 	render() {
-		return (
-			<View style={styles.aperture}>
-				<View style={styles.topButtonGroup}>
-					<ArticleSelect ref={this.articleSelectRef} />
-				</View>
-				<PinchGestureHandler
-					onGestureEvent={this._onPinchGestureEvent}
-					onHandlerStateChange={this._onPinchHandlerStateChange}>
-					<View collapsable={false}>
-						<RNCamera
-							ref={this.camera}
-							style={styles.camera}
-							type={RNCamera.Constants.Type.back}
-							flashMode={this.state.flash}
-							captureAudio={false}
-							zoom={this.state.zoom}
-							maxZoom={0}
-						/>
+		if (this.state.focusedScreen) {
+			return (
+				<View style={styles.aperture}>
+					<View style={styles.topButtonGroup}>
+						<ArticleSelect ref={this.articleSelectRef} />
 					</View>
-				</PinchGestureHandler>
-				<View style={styles.bottomButtonGroup}>
-					<TouchableOpacity onPress={this.cancel} style={{ marginLeft: 10 }}>
-						<Image source={ Constants.open ?  require('../../assets/open-resources/back.png') :require('../../assets/resources/back.png')} style={{ ...smallImageStyle.image, width: 50 }} />
-					</TouchableOpacity>
-					<TouchableOpacity onPress={this.snap}>
-						<View>
-							<Image source={ Constants.open ?  require('../../assets/open-resources/camera.png') :require('../../assets/resources/camera.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+					<PinchGestureHandler
+						onGestureEvent={this._onPinchGestureEvent}
+						onHandlerStateChange={this._onPinchHandlerStateChange}>
+						<View collapsable={false}>
+							<RNCamera
+								ref={this.camera}
+								style={styles.camera}
+								type={RNCamera.Constants.Type.back}
+								flashMode={this.state.flash}
+								captureAudio={false}
+								zoom={this.state.zoom}
+								maxZoom={0}
+							/>
 						</View>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={this.toggleFlash} style={{ marginRight: 10 }}>
-						{this.getFlash()}
-					</TouchableOpacity>
+					</PinchGestureHandler>
+					<View style={styles.bottomButtonGroup}>
+						<TouchableOpacity onPress={this.cancel} style={{ marginLeft: 10 }}>
+							<Image source={Constants.open ? require('../../assets/open-resources/back.png') : require('../../assets/resources/back.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={this.snap}>
+							<View>
+								<Image source={Constants.open ? require('../../assets/open-resources/camera.png') : require('../../assets/resources/camera.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+							</View>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={this.toggleFlash} style={{ marginRight: 10 }}>
+							{this.getFlash()}
+						</TouchableOpacity>
+					</View>
 				</View>
-			</View>
-		);
+			);
+		} else {
+			return (
+				<View style={styles.aperture}>
+					<View style={styles.topButtonGroup}>
+						<ArticleSelect ref={this.articleSelectRef} />
+					</View>
+					<View />
+					<View style={styles.bottomButtonGroup}>
+						<TouchableOpacity onPress={this.cancel} style={{ marginLeft: 10 }}>
+							<Image source={Constants.open ? require('../../assets/open-resources/back.png') : require('../../assets/resources/back.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+						</TouchableOpacity>
+						<TouchableOpacity onPress={this.snap}>
+							<View>
+								<Image source={Constants.open ? require('../../assets/open-resources/camera.png') : require('../../assets/resources/camera.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+							</View>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={this.toggleFlash} style={{ marginRight: 10 }}>
+							{this.getFlash()}
+						</TouchableOpacity>
+					</View>
+				</View>
+			);
+
+		}
+
+
 	}
 
 	getFlash(): JSX.Element {
 		switch (this.state.flash) {
 			case RNCamera.Constants.FlashMode.off:
-				return <Image source={ Constants.open ?  require('../../assets/open-resources/flash-off.png') :require('../../assets/resources/flash-off.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+				return <Image source={Constants.open ? require('../../assets/open-resources/flash-off.png') : require('../../assets/resources/flash-off.png')} style={{ ...smallImageStyle.image, width: 50 }} />
 			case RNCamera.Constants.FlashMode.auto:
-				return <Image source={ Constants.open ?  require('../../assets/open-resources/auto-flash.png') :require('../../assets/resources/auto-flash.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+				return <Image source={Constants.open ? require('../../assets/open-resources/auto-flash.png') : require('../../assets/resources/auto-flash.png')} style={{ ...smallImageStyle.image, width: 50 }} />
 			default:
-				return <Image source={ Constants.open ?  require('../../assets/open-resources/flash.png') :require('../../assets/resources/flash.png')} style={{ ...smallImageStyle.image, width: 50 }} />
+				return <Image source={Constants.open ? require('../../assets/open-resources/flash.png') : require('../../assets/resources/flash.png')} style={{ ...smallImageStyle.image, width: 50 }} />
 		}
 	}
 
@@ -218,9 +272,9 @@ const styles = StyleSheet.create({
 		backgroundColor: 'white'
 	},
 	camera: Platform.select({
-		ios:{height: hp(65),},
-		android:{height: hp(52)}
-		
+		ios: { height: hp(65), },
+		android: { height: hp(52) }
+
 	}),
 	bottomButtonGroup: {
 		flexDirection: 'row',

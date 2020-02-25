@@ -140,7 +140,7 @@ export default class App extends Component<IState, any> {
           <Spinner
             visible={!this.state.init}
             textContent={'Loading...'}
-            textStyle={{ color: '#FFF' }}
+            textStyle={styles.bText}
           />
           <Image source={Constants.open ? require('./assets/open-resources/wardrobe-app.png') : require('./assets/resources/wardrobe-app.png')} style={styles.image} />
         </View>);
@@ -162,5 +162,17 @@ const styles = StyleSheet.create({
     height: undefined,
     aspectRatio: 1
 
-  }
+  },
+  bText: Platform.select({
+		ios: {
+      color: '#FFF',
+      fontFamily: 'Arial',
+      fontSize: 4
+		},
+		android: {
+      color: '#FFF',
+      fontFamily: 'Arial',
+      fontSize: 12
+		}
+	})
 });

@@ -18,7 +18,11 @@ export default class ArticleSelect extends Component<IProps, IState> {
   }
 
   onArticleTypeSelect(articleType: ArticleType) {
-    this.setState({ articleType: articleType });
+    try {
+      this.setState({ articleType: articleType });
+    } catch (error) {
+      console.log(`ArticleSelect.onArticleTypeSelect() ArticleType = ${articleType} Error: ${error}`);
+    }
   }
 
   onGetArticleType(): ArticleType {
@@ -45,7 +49,7 @@ export default class ArticleSelect extends Component<IProps, IState> {
             <Image style={this.getImageStyle(ArticleType.wShoe)} source={DefaultArticles.getDefault(ArticleType.wShoe).image} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { this.onArticleTypeSelect(undefined) }}  >
-            <Image style={this.getImageStyle(undefined)} source={ Constants.open ?  require('../../assets/open-resources/hanger_off.png') :require('../../assets/resources/hanger_off.png')} />
+            <Image style={this.getImageStyle(undefined)} source={Constants.open ? require('../../assets/open-resources/hanger_off.png') : require('../../assets/resources/hanger_off.png')} />
           </TouchableOpacity>
         </View>);
     } else {

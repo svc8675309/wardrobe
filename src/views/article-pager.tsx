@@ -51,6 +51,10 @@ export default class ArticlePager extends React.Component<IProps, IState> {
 
   parentSetState(articles: IArticle[], index: number) {
     this.setState({ articles: articles });
+    if (index > -1) {
+      const carouselref = this.refs.carousel as any;
+      carouselref.snapToItem(index);
+    }
   }
 
   articleManage(anyArticle: IArticle, index: number) {

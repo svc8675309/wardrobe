@@ -17,6 +17,9 @@ const MainNavigator = createMaterialTopTabNavigator(
   },
   {
     tabBarOptions: {
+      indicatorStyle: {
+        opacity: 0
+      },
       activeTintColor: 'white',
       showIcon: true,
       showLabel: false,
