@@ -10,26 +10,30 @@
 
 A clothing management tool allowing users to
 
-* Peruse articles of apparel from a mobil device.
+* Peruse your wardrobe from a mobil device.
 * Snap pics to see how an item might work with what you have.
-* Share clothing via your mobil gallery.
+* The embedded camera takes "small" pictures ( ~50K ) to minimize space.
+* Wardrobe uses an album named "Wardrobe Storage Unit" allowing new clothing items to be managed / or shared.
 
 ![example](wardrobe-anamated.gif)
 
-## Security
+## Privacy Policy
 
-    Wardrobe does not access wireless. Clothing pics are either: imported by copying them to an album named 
-    ( Wardrobe Storage Unit ), created when this app is first launched, or by using the included camera. 
-    All state including article selections, ratings, and album contents are stored locally.
+    Wardrobe creates an album on your device named "Wardrobe Storage Unit".
+    It is initially populated with some of my apperal items for demonstration purposes.
+    No data leaves your Device. All pictures take are stored in your gallery under the aforementioned album.
+    The only other data kept are your own apperal item assignments. This data is stored on your device.
+    No personal data beyond pics of clothing articles are asked for.
+    Wardrobe does not access wireless.
+    It needs access to your camera and local storage for the reasons mentioned above.
 
 ## Images / Icons
 
-    To keep this repo public I had to gitignore my licensed ( www.flaticon.com ) images. So when you see code like
+    To keep this repo public I had to gitignore my licensed ( www.flaticon.com ) images. 
     
-    ...  Constants.open ?  require('../../assets/open-resources ...
+    So when you see code like, "...  Constants.open ?  require('../../assets/open-resources ..."
 
-    Basically I provide some font-awesome and custom images for opensource, then change the setting locally to use my "Store bought" 
-    local resources image dir for distribution.
+    I'm replacing opensource icons ( font-awesome ) in this repo with the licensed ones stored locally on my box. 
 
 ## Usage
 
@@ -48,4 +52,16 @@ A clothing management tool allowing users to
 ![wSe](/assets/open-resources/settings-sm.png)
 
 * Clear the wardrobe.
-* My info and credits to open source modules used to construct this app.
+* My info and credits to open source repos used to construct this app.
+
+## Build
+
+I built this project with the following versions of software installed. 
+* node.js v10.15.3
+* npm 6.4.1
+* yarn v1.19.2
+* react-native 0.61.5
+
+To build
+* yarn install
+* yarn ios  / yarn andorid
