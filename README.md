@@ -65,3 +65,6 @@ I built this project with the following versions of software installed.
 To build
 * yarn install
 * yarn ios  / yarn andorid
+
+Note: This was my first react-native app... A review of the App Store, after the fact, yeilded that others have done this same kind of thing ( I should have checked first ). Nevertheless, maybe some of this code will help someone else. :-)
+
