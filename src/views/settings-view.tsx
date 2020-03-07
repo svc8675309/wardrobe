@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   bText: Platform.select({
 		ios: {
       fontFamily: 'Arial',
-      fontSize: 4
+      fontSize: 12
 		},
 		android: {
       fontFamily: 'Arial',
