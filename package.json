@@ -22,7 +22,7 @@
     "react-native-loading-spinner-overlay": "^1.0.1",
     "react-native-modal": "^11.5.3",
     "react-native-ratings": "^6.5.0",
-    "react-native-reanimated": "^1.4.0",
+    "react-native-reanimated": "^2.10.0",
     "react-native-settings-list": "^1.8.0",
     "react-native-snap-carousel": "^3.8.4",
     "react-navigation": "^4.0.10",
